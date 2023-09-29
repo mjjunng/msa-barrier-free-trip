@@ -1,0 +1,38 @@
+server:
+  port: 8000
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  application:
+    name: bft-apigateway-service
+
+  cloud:
+    gateway:
+      routes:
+        - id: bft-member-service    #register user-service's forwarding
+          uri: lb://BFT-MEMBER-SERVICE
+          predicates:
+            - Path=/bft-member-service/**
+          filters:
+#            - RemoveRequestHeader=Cookie
+            - RewritePath=/bft-member-service/(?<segment>.*), /$\{segment}  # remove prefix path -> rewrite path
+
+        - id: bft-main-service    #register user-service's forwarding
+          uri: lb://BFT-MAIN-SERVICE
+          predicates:
+            - Path=/bft-main-service/**
+          filters:
+            #            - RemoveRequestHeader=Cookie
+            - RewritePath=/bft-main-service/(?<segment>.*), /$\{segment}  # remove prefix path -> rewrite path
+
+
+
+
